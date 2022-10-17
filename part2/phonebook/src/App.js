@@ -1,46 +1,97 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+
 import Persons from "./components/Persons"
 import Filter from "./components/Filter"
 import AddForm from "./components/AddForm"
+import Notification from './components/Notification'
+
+import personService from "./services/persons"
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setNewFilter] = useState('')
+  const [notification, setNotification] = useState({})
 
   useEffect(() => {
-    console.log('effect')
-    axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-        console.log('promise fullfilled')
-        setPersons(response.data)
-    })
+    personService
+      .getAll()
+      .then(persons => {
+        setPersons(persons)
+      })
   }, [])
-  console.log('render', persons.length, 'persons')
-
   
   const addPerson = (event) => {
     event.preventDefault()
-    if( persons.some(person => {
-        if(person.name === newName) 
-          return true 
-        else 
-          return false
-    })) {
-      window.alert(`${newName} is already added to phonebook`)
+
+    const existingPerson= persons.find(({name}) => name === newName)
+
+    if(existingPerson !== undefined) {
+     if(window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) 
+        updatePerson(existingPerson, newNumber)
     } else {
-      const nameObject = {
-        name: newName,
-        number: newNumber,
-        id: persons.length + 1
-      }
-      setPersons(persons.concat(nameObject))
-      setNewName('')
-      setNewNumber('')
+        const newPerson = {
+          name: newName,
+          number: newNumber
+        }
+        personService
+          .create(newPerson)
+          .then(person => {
+            setPersons([...persons, person])
+            setNewName('')
+            setNewNumber('')
+            setNotification({message: `Added ${newName}`, color: 'green'})
+            setTimeout(() => setNotification({}), 5000)
+        })
+          .catch(error => {
+            console.log(error)
+            setNotification({message: `Failed to add ${newName}`, color: 'red'})
+            setTimeout(()=> setNotification({}), 5000)
+        })
+
     }
+  }
+
+  const updatePerson = (person, number) => {
+    const newPerson = {...person, number}
+    personService
+      .update(person.id, newPerson)
+      .then(result => {
+        const newPersons = persons.map(p => {
+          if(p.id === person.id) return result
+          else return p
+        })
+        setPersons(newPersons)
+        setNewName('')
+        setNewNumber('')
+        setNotification({message: `Updated ${newName}`, color: 'green'})
+        setTimeout(()=> setNotification({}), 5000)
+      })
+      .catch(error => {
+        console.log(error)
+        setNotification({message: 'Failed to update', color: 'red'})
+        setTimeout(()=> setNotification({}), 5000)
+      })
+  }
+  
+  const remove = (name, id) => {
+    personService.remove(id)
+    .then(() => {
+      setPersons(persons.filter(person => person.id !== id))
+      setNotification({message: `Removed ${name}`, color: 'red'})
+      setTimeout(()=> setNotification({}), 5000)
+    })
+    .catch(error => {
+      console.log(error)
+      setNotification({message: `Information of ${name} has already been removed from server`, color: 'red'})
+      setTimeout(()=> setNotification({}), 5000)
+    })
+  }
+
+  const removeNotif = (name, id) => {
+    if(window.confirm(`Delete ${name} ?`))
+        remove(name, id)
   }
 
   const handleNameChange = (event) => setNewName(event.target.value)
@@ -50,11 +101,15 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification.message} color={notification.color} />
       <Filter filter={filter} onChange={handleFilterChange} />
       <h2>Add a new</h2>
       <AddForm onSubmit={addPerson} name={newName} number={newNumber} onChangeName={handleNameChange} onChangeNumber={handleNumberChange}/>
       <h2>Numbers</h2>
-      <Persons persons={persons.filter(({ name }) => name.toLowerCase().includes(filter.toLowerCase()))}/>
+      <Persons 
+      persons={persons.filter(({ name }) => name.toLowerCase().includes(filter.toLowerCase()))}
+      deletePerson={removeNotif}
+      />
     </div>
     
   )

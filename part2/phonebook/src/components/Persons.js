@@ -1,15 +1,17 @@
 import Person from "./Person"
 
-const Persons = ({ persons }) => {
-  const content = persons.map(p => 
+const Persons = ({ persons, deletePerson }) => {
+  const listofpersons = persons.map(p => 
     <div key={p.id}>
-      <Person person={p} />
+      <Person 
+      person={p} 
+      deletePerson={() => deletePerson(p.name, p.id)} />
     </div>
-    
+
     )
     return (
       <div>
-        {content}
+        {listofpersons}
       </div>
     )
   }
