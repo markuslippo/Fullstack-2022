@@ -70,11 +70,11 @@ const App = () => {
       })
       .catch(error => {
         console.log(error)
-        setNotification({message: 'Failed to update', color: 'red'})
+        setNotification({message: 'Failed to update person', color: 'red'})
         setTimeout(()=> setNotification({}), 5000)
       })
   }
-  
+
   const remove = (name, id) => {
     personService.remove(id)
     .then(() => {
