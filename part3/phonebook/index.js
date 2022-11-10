@@ -12,7 +12,7 @@ const requestLogger = (request, response, next) => {
     console.log('Body:  ', request.body)
     console.log('---')
     next()
-}
+  }
 
 app.use(express.json())
 app.use(requestLogger)
@@ -29,7 +29,7 @@ app.get('/', (request, response) => {
 
 app.get('/info', (request, response) => {
     Person.count({}, function( err, count) {
-        response.send(`
+    response.send(`
     <p>Phonebook has info for ${count}  people <br>
     <p>${Date()}<p>
     </p>`)
