@@ -15,9 +15,12 @@ const App = () => {
 
   const blogFormRef = useRef()
 
+
   useEffect(() => {
-    blogService.getAll().then(blogs =>
+    blogService.getAll().then(blogs => {
+      console.log(blogs)
       setBlogs(blogs)
+    }
     )
   }, [])
 
@@ -38,13 +41,16 @@ const App = () => {
 
   // ADD BLOG
 
-  const addBlog = async(blogObject) => {
+  const addBlog = (blogObject) => {
+    console.log('App.js: ', blogObject)
     blogFormRef.current.toggleVisibility()
 
-    console.log(blogObject)
-    const createdBlog = await blogService.create(blogObject)
-    const newBlogs = [...blogs, createdBlog]
-    setBlogs(newBlogs)
+    blogService
+      .create(blogObject)
+      .then(returnedBlog => {
+        console.log('Returned blog: ', returnedBlog)
+        setBlogs(blogs.concat(returnedBlog))
+      })
   }
 
 

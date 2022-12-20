@@ -2,6 +2,7 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const middleware = require('../utils/middleware')
 
+
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
@@ -26,7 +27,7 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     author: body.author,
     url: body.url,
     likes: body.likes,
-    user: user._id
+    user: user.id
   })
 
   if(blog.likes === undefined)
@@ -36,20 +37,28 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
-  response.status(201).json(savedBlog)
+  const populatedBlog = await Blog
+    .findById( savedBlog._id )
+    .populate('user', { username: 1, name: 1 })
+
+  response.status(201).json(populatedBlog.toJSON())
 })
 
 blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
-  const user = await request.user
-  const blog = await Blog.findById(request.params.id)
-
-  if(blog.user.toString() === user._id.toString()){
-    await Blog.findByIdAndRemove(request.params.id)
-    response.status(204).end()
-  } else {
-    response.status(401).json({ error: 'no permission for this operation' })
+  const blogToDelete = await Blog.findById(request.params.id)
+  if (!blogToDelete ) {
+    return response.status(204).end()
   }
 
+  if ( blogToDelete.user && blogToDelete.user.toString() !== request.user.id ) {
+    return response.status(401).json({
+      error: 'only the creator can delete a blog'
+    })
+  }
+
+  await Blog.findByIdAndRemove(request.params.id)
+
+  response.status(204).end()
 
 })
 
@@ -61,10 +70,10 @@ blogsRouter.put('/:id', async (request, response) => {
 
   const body = request.body
   const blog = {
-    author: body.author || blog.author,
-    likes: body.likes !== undefined ? body.likes : blog.likes,
-    title: body.title || blog.title,
-    url: body.url || blog.url
+    author: body.author || searchBlog.author,
+    likes: body.likes !== undefined ? body.likes : searchBlog.likes,
+    title: body.title || searchBlog.title,
+    url: body.url || searchBlog.url
   }
 
   const updateBlog = await Blog.findByIdAndUpdate(id, blog, { new: true })

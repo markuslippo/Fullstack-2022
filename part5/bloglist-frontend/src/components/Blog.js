@@ -36,7 +36,7 @@ const Blog = ({ blog, user, updateLikes, setNotification, removeFromList }) => {
 
   return(
     <div style={blogStyle}>
-      <div>
+      <div id='blog'>
         <p id='blogInfo' className='titleAndAuthor'>{blog.title} {blog.author}
           <input
             id='view-button'
@@ -64,6 +64,7 @@ const Blog = ({ blog, user, updateLikes, setNotification, removeFromList }) => {
       {blog.user.id === user.id &&
     <div>
       <input
+        id='remove-button'
         type={'button'}
         value={'remove'}
         onClick={() => handleRemove()}

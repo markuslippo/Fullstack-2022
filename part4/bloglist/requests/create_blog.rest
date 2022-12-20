@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1ha2UiLCJpZCI6IjYzN2Y1YjhiNTE1MDNjYmM2OWEyMTBkOCIsImlhdCI6MTY3MDg0NTA4M30.f6-MGI0ICZsaB3s47NTghyAzdOElrVYNO5Guks-qmAk
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRlc3RpdHVubnVzIiwiaWQiOiI2M2ExY2I4NWM2OGYxMjIzMGNlYWExMmMiLCJpYXQiOjE2NzE1NDc5MzZ9.PT23QQVTjgio-EaUtoIw6YeWc1fJScbNOdnyWLmSui4
 
 {
-    "title": "Normaali blogi",
-    "author": "Nandos",
-    "url": "www.random.fi"
+    "title": "Toinen",
+    "author": "asd",
+    "url": "www.osoite.fi",
+    "likes": "2"
 }

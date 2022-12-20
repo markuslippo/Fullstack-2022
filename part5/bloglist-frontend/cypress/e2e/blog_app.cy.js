@@ -14,12 +14,11 @@ describe('Blog app', function() {
 
 
   describe('Login', function() {
-
     it('succeeds with correct credentials', function() {
       cy.get('#username').type('Testi')
       cy.get('#password').type('1234')
       cy.get('#login-button').click()
-      cy.contains('Markus logged in')
+      cy.contains('make logged in')
     })
 
     it('fails with incorrect credentials', function() {
@@ -48,14 +47,12 @@ describe('Blog app', function() {
           .should('contain', 'a new blog Testing Blog for Cypress by Tester added')
           .and('have.css', 'color', 'rgb(0, 128, 0)')
 
-        cy.get('.blogInfo')
-          .should('contain', 'Testing blog for Cypress Tester' )
+        cy.contains('Testing Blog for Cypress Tester')
       })
 
       it('A blog can be liked', function() {
-        cy.createBlog({ title: 'Testblog', author: 'Tester', url: 'www.test.com' })
+        cy.createBlog({ title: 'Testblog', author: 'Tester', url: 'www.test.com', likes: 0 })
         cy.get('#view-button').click()
-
         cy.contains('likes 0')
         cy.get('#like-button').click()
         cy.contains('likes 1')
@@ -64,12 +61,30 @@ describe('Blog app', function() {
 
       it('A blog can be deleted', function() {
         cy.createBlog({ title: 'Testblog', author: 'Tester', url: 'www.test.com' })
-        cy.get('#view-button').click()
+        cy.contains('Testblog Tester')
 
-        cy.contains()
+        cy.get('#view-button').click()
+        cy.get('#remove-button').click()
+        cy.get('html').should('not.contain', 'Testblog Tester')
       })
 
+      it('Blogs are ranked by likes', function() {
+        cy.createBlog({ title: 'Blog with 0 likes', author: 'Tester', url: 'www.test.com' })
+        cy.createBlog({ title: 'Blog with 1 like', author: 'Tester', url: 'www.test.com' })
 
+        cy.contains('div', 'Blog with 1 like')
+          .within(() => {
+            cy.get('#view-button').click()
+          })
+        cy.get('#like-button').click()
+        cy.contains('div', 'Blog with 1 like')
+          .within(() => {
+            cy.get('#view-button').click()
+          })
+
+        cy.get('ul div:first').should('contain', 'Blog with 1 like')
+        cy.get('ul div:last').should('contain', 'Blog with 0 likes')
+      })
     })
   })
 
