@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRlc3RpdHVubnVzIiwiaWQiOiI2M2JlYTViMGE1NmJjZDg3Zjk4OWE2ODEiLCJpYXQiOjE2NzM0Mzg2NDR9._j9cJjxbdqzKrLKZXOFVLAs0I6RzgR2ULcOAz8r0yZg
+
+{
+    "title": "Blogi",
+    "author": "Makke Poika",
+    "url": "www.osoite.fi",
+    "likes": "2"
+}
