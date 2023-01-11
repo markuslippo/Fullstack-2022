@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 
 import { Button } from 'react-bootstrap'
 
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 
 import Blog from './components/Blog'
 import Notification from './components/Notification'
@@ -19,6 +19,8 @@ const App = () => {
   const [notification, setNotification] = useState({})
 
   const blogFormRef = useRef()
+
+  const navigate = useNavigate()
 
 
   useEffect(() => {
@@ -39,6 +41,7 @@ const App = () => {
   }, [])
 
   const handleLogout = async() => {
+    navigate('/')
     setUser(null)
     window.localStorage.removeItem('loggedBlogappUser')
   }
